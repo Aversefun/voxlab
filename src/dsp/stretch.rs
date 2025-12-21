@@ -1,6 +1,8 @@
 //! Time-stretch.
 
-use crate::{audio::buffer::AudioBuffer, dsp::window::hann};
+use plotters::style::RED;
+
+use crate::{audio::buffer::AudioBuffer, dsp::window::hann, plotting::Plot};
 
 const WINDOW_SIZE: usize = 1024;
 const ANALYSIS_HOP: usize = 256;
@@ -45,13 +47,19 @@ pub fn time_stretch(input: &AudioBuffer, stretch: f32) -> AudioBuffer {
 /// Time-stretch where it changes over time. The function takes in a value
 /// between 0 and 1 (where 0 is the first frame and 1 is the last) and outputs
 /// how much to stretch.
-pub fn time_glide(input: &AudioBuffer, mut stretch: impl FnMut(f32) -> f32) -> AudioBuffer {
+pub fn time_glide(
+    input: &AudioBuffer,
+    mut stretch: impl FnMut(f32) -> f32,
+    plot: &mut Plot<'_>,
+) -> AudioBuffer {
     let window = hann(WINDOW_SIZE);
 
     let mut output = vec![0.0f32; input.samples.len()];
 
     let mut in_pos = 0usize;
     let mut out_pos = 0usize;
+
+    plot.plot(&mut stretch, &RED, "time glide").unwrap();
 
     while (in_pos + WINDOW_SIZE) < input.samples.len() {
         let t = in_pos as f32 / input.samples.len() as f32;

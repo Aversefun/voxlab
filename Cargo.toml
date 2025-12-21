@@ -5,6 +5,7 @@ edition = "2024"
 
 [dependencies]
 hound = "3.5.1"
+plotters = "0.3.7"
 
 [lints.rust]
 missing_docs = "deny"
