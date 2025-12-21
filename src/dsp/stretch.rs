@@ -1,8 +1,12 @@
 //! Time-stretch.
 
-use plotters::style::RED;
+use plotters::style::{BLUE, RED};
 
-use crate::{audio::buffer::AudioBuffer, dsp::window::hann, plotting::Plot};
+use crate::{
+    audio::buffer::AudioBuffer,
+    dsp::{low_pass, window::hann},
+    plotting::Plot,
+};
 
 const WINDOW_SIZE: usize = 1024;
 const ANALYSIS_HOP: usize = 256;
@@ -52,19 +56,36 @@ pub fn time_glide(
     mut stretch: impl FnMut(f32) -> f32,
     plot: &mut Plot<'_>,
 ) -> AudioBuffer {
+    plot.plot(&mut stretch, &BLUE, "raw time glide").unwrap();
+
     let window = hann(WINDOW_SIZE);
 
     let mut output = vec![0.0f32; input.samples.len()];
 
     let mut in_pos = 0usize;
+    let mut in_frame = 0usize;
     let mut out_pos = 0usize;
 
-    plot.plot(&mut stretch, &RED, "time glide").unwrap();
+    let mut stretch_vals = Vec::new();
+
+    let total_frames = input.samples.len() / ANALYSIS_HOP;
+
+    for i in 0..total_frames {
+        let t = i as f32 / total_frames as f32;
+        stretch_vals.push(stretch(t));
+    }
+
+    stretch_vals = low_pass(stretch_vals, 0.05);
+
+    plot.plot(
+        |x| stretch_vals[(x * total_frames as f32) as usize],
+        &RED,
+        "filtered time glide",
+    )
+    .unwrap();
 
     while (in_pos + WINDOW_SIZE) < input.samples.len() {
-        let t = in_pos as f32 / input.samples.len() as f32;
-
-        let stretch = stretch(t);
+        let stretch = stretch_vals[in_frame];
         assert!(stretch > 0.0);
 
         let synthesis_hop = (ANALYSIS_HOP as f32 * stretch) as usize;
@@ -84,6 +105,7 @@ pub fn time_glide(
 
         in_pos += ANALYSIS_HOP;
         out_pos += synthesis_hop;
+        in_frame += 1;
     }
 
     AudioBuffer {
