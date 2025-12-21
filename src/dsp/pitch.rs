@@ -17,10 +17,7 @@ pub fn pitch_shift(input: &AudioBuffer, ratio: f32) -> AudioBuffer {
         let frac = pos - idx as f32;
 
         let s0 = input.samples[idx];
-        let s1 = input.samples
-            .get(idx + 1)
-            .copied()
-            .unwrap_or(s0);
+        let s1 = input.samples.get(idx + 1).copied().unwrap_or(s0);
 
         out.push(lerp(s0, s1, frac));
     }

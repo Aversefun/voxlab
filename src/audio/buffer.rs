@@ -12,7 +12,7 @@ impl AudioBuffer {
     pub fn map(&self, f: impl FnMut(f32) -> f32) -> Self {
         Self {
             sample_rate: self.sample_rate,
-            samples: self.samples.iter().copied().map(f).collect()
+            samples: self.samples.iter().copied().map(f).collect(),
         }
     }
 }

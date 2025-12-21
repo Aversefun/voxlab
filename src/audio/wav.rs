@@ -23,11 +23,7 @@ pub fn import_wav(path: impl AsRef<Path>) -> hound::Result<AudioBuffer> {
     }
 
     let samples = match spec.sample_format {
-        hound::SampleFormat::Float => {
-            reader
-                .samples::<f32>()
-                .collect::<Result<Vec<_>, _>>()?
-        }
+        hound::SampleFormat::Float => reader.samples::<f32>().collect::<Result<Vec<_>, _>>()?,
 
         hound::SampleFormat::Int => {
             let max = (1i64 << (spec.bits_per_sample - 1)) as f32;
@@ -47,16 +43,18 @@ pub fn import_wav(path: impl AsRef<Path>) -> hound::Result<AudioBuffer> {
 
 /// Export a WAV file.
 pub fn export_wav(buffer: AudioBuffer, path: impl AsRef<Path>) -> hound::Result<()> {
-    let mut writer = hound::WavWriter::create(path, WavSpec {
-        channels: 1,
-        sample_rate: buffer.sample_rate,
-        bits_per_sample: 32,
-        sample_format: hound::SampleFormat::Float
-    })?;
+    let mut writer = hound::WavWriter::create(
+        path,
+        WavSpec {
+            channels: 1,
+            sample_rate: buffer.sample_rate,
+            bits_per_sample: 32,
+            sample_format: hound::SampleFormat::Float,
+        },
+    )?;
     for sample in buffer.samples {
         writer.write_sample(sample)?;
     }
     writer.finalize()?;
     Ok(())
 }
-

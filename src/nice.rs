@@ -13,5 +13,9 @@ pub fn lerp_list(list: impl AsRef<[f32]>, t: f32) -> f32 {
     if t.is_nan() {
         panic!("NaN")
     }
-    lerp(list[t.trunc() as usize], list[t.trunc() as usize + 1], t.fract())
+    lerp(
+        list[t.trunc() as usize],
+        list[t.trunc() as usize + 1],
+        t.fract(),
+    )
 }
