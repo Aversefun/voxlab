@@ -46,9 +46,9 @@ impl<'a> Plot<'a> {
     pub fn plot(
         &mut self,
         mut func: impl FnMut(f32) -> f32,
-        style: impl Into<ShapeStyle>,
+        style: impl Into<ShapeStyle> + Clone + 'a,
         caption: impl AsRef<str>,
-    ) -> Result<&mut Self, Box<dyn Error>> {
+    ) -> Result<(), Box<dyn Error>> {
         self.chart
             .draw_series(LineSeries::new(
                 self.x_range
@@ -56,9 +56,30 @@ impl<'a> Plot<'a> {
                     .step(self.x_step)
                     .values()
                     .map(|x| (x, func(x))),
-                style,
+                style.clone(),
             ))?
-            .label(caption.as_ref());
-        Ok(self)
+            .label(caption.as_ref())
+            .legend(move |(x, y)| PathElement::new(vec![(x, y), (x + 20, y)], style.clone()));
+        Ok(())
+    }
+    pub fn plot_points(
+        &mut self,
+        mut func: impl FnMut(f32) -> f32,
+        style: impl Into<ShapeStyle> + Clone + 'a,
+        caption: impl AsRef<str>,
+    ) -> Result<(), Box<dyn Error>> {
+        self.chart
+            .draw_series(PointSeries::<(f32, f32), _, Circle<_, _>, i32>::new(
+                self.x_range
+                    .clone()
+                    .step(self.x_step)
+                    .values()
+                    .map(|x| (x, func(x))),
+                5i32,
+                style.clone(),
+            ))?
+            .label(caption.as_ref())
+            .legend(move |(x, y)| PathElement::new(vec![(x, y), (x + 20, y)], style.clone()));
+        Ok(())
     }
 }

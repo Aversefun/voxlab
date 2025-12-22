@@ -8,11 +8,16 @@ mod plotting;
 
 use std::{error::Error, f32::consts::TAU};
 
+use plotters::style::{
+    BLACK,
+    full_palette::PURPLE,
+};
+
 use crate::{
     audio::wav,
     dsp::{
-        pitch::{pitch_glide, pitch_shift},
-        stretch::time_glide,
+        pitch::pitch_glide,
+        stretch::time_glide, window_calc::find_window,
     },
     phoneme::ipa::Vowel,
     plotting::Plot,
@@ -34,6 +39,14 @@ fn main() -> Result<(), Box<dyn Error>> {
 
         let mut plot = Plot::new(&file_name, "Glide", 0.0..1.0, 0.0..4.0, 0.05)?;
 
+        plot.plot(
+            |x| file.samples[(x * file.samples.len() as f32).floor() as usize] * 4.0,
+            PURPLE,
+            "Input audio",
+        )?;
+
+        find_window(&file, &mut plot);
+
         const VIBRATO_DEPTH: f32 = 1.1;
         const VIBRATO_RATE: f32 = 0.65;
 
@@ -46,6 +59,12 @@ fn main() -> Result<(), Box<dyn Error>> {
             |t| 1.0 + 0.05 * (TAU * t).sin(),
             &mut plot,
         );
+        // plot.plot(
+        //     |x| buf.samples[(x * buf.samples.len() as f32).floor() as usize] * 4.0,
+        //     BLACK,
+        //     "Output audio",
+        // )?;
+
         println!(
             "{ratio}x pitch and time: {} samples ({} sample rate)",
             buf.samples.len(),
