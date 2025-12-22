@@ -11,3 +11,14 @@ pub fn hann(len: usize) -> Vec<f32> {
 
     return out;
 }
+
+fn apply_window(
+    samples: &[f32],
+    window: &[f32],
+    out: &mut [f32],
+) {
+    for i in 0..samples.len() {
+        out[i] += samples[i] * window[i];
+    }
+}
+

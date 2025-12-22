@@ -16,8 +16,7 @@ use plotters::style::{
 use crate::{
     audio::wav,
     dsp::{
-        pitch::pitch_glide,
-        stretch::time_glide, window_calc::find_window,
+        pitch::pitch_glide, psola::psola_constant, stretch::time_glide, window_calc::find_window
     },
     phoneme::ipa::Vowel,
     plotting::Plot,
@@ -45,20 +44,21 @@ fn main() -> Result<(), Box<dyn Error>> {
             "Input audio",
         )?;
 
-        find_window(&file, &mut plot);
+        // find_window(&file, &mut plot);
 
         const VIBRATO_DEPTH: f32 = 1.1;
         const VIBRATO_RATE: f32 = 0.65;
 
-        let buf = time_glide(
-            &pitch_glide(
-                &file,
-                |t| ratio * (1.0 + VIBRATO_DEPTH * (TAU * VIBRATO_RATE * t).sin()),
-                &mut plot,
-            ),
-            |t| 1.0 + 0.05 * (TAU * t).sin(),
-            &mut plot,
-        );
+        // let buf = time_glide(
+        //     &pitch_glide(
+        //         &file,
+        //         |t| ratio * (1.0 + VIBRATO_DEPTH * (TAU * VIBRATO_RATE * t).sin()),
+        //         &mut plot,
+        //     ),
+        //     |t| 1.0 + 0.05 * (TAU * t).sin(),
+        //     &mut plot,
+        // );
+        let buf = psola_constant(&file, ratio, 1.0/ratio, &mut plot);
         // plot.plot(
         //     |x| buf.samples[(x * buf.samples.len() as f32).floor() as usize] * 4.0,
         //     BLACK,

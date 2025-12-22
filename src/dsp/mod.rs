@@ -4,6 +4,7 @@ pub mod pitch;
 pub mod stretch;
 pub mod window;
 pub mod window_calc;
+pub mod psola;
 
 pub fn low_pass(values: Vec<f32>, alpha: f32) -> Vec<f32> {
     let mut out = vec![0.0f32; values.len()];
