@@ -13,6 +13,8 @@ pub enum Phoneme {
 pub enum Vowel {
     /// Open back unrounded vowel (IPA: ɑ)
     OpenBackUnrounded,
+    /// Close front unrounded vowel (IPA: i)
+    CloseFrontUnrounded,
 }
 
 impl Vowel {
@@ -20,6 +22,7 @@ impl Vowel {
     pub fn ipa(&self) -> &'static str {
         match self {
             Vowel::OpenBackUnrounded => "ɑ",
+            Vowel::CloseFrontUnrounded => "i",
         }
     }
 }

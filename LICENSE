@@ -1,0 +1,77 @@
+# Anti-Capitalist Queer License v0.1
+
+Derived from the [Opinionated Queer License v1.3](https://oql.avris.it/license/v1.3.md).
+
+Copyright © 2025 Vivian Beck
+
+## 1. Permissions
+
+The creators of the Work (“The Licensor”) grant permission
+to any person, group or legal entity that doesn't violate the prohibitions below (“The User”),
+to do everything with the Work that would otherwise infringe their copyright or any patent claims,
+subject to the following conditions:
+
+## 2. Obligations
+
+The User must give appropriate credit to the Licensor,
+provide a copy of this license, and indicate whether and what kind of changes were made.
+The User may do so in any reasonable manner,
+but not in any way that suggests the Licensor endorses the User or their use.
+The User must also provide some form of link to the original Work.
+The User must affirm that LGBTQ+ rights are human rights and not contradict this statement.
+
+## 3. Prohibitions
+
+No one may use the Work for prejudiced or bigoted purposes, including but not limited to:
+racism, xenophobia, queerphobia, queer exclusionism, homophobia, transphobia, enbyphobia, misogyny.
+
+No one may use the Work to inflict or facilitate violence or abuse of human rights,
+as defined in either of the following documents:
+[Universal Declaration of Human Rights](https://www.un.org/en/about-us/universal-declaration-of-human-rights),
+[European Convention on Human Rights](https://prd-echr.coe.int/web/echr/european-convention-on-human-rights)
+along with the rulings of the [European Court of Human Rights](https://www.echr.coe.int/).
+
+No entity that commits such abuses or materially supports entities that do
+may use the Work for any reason.
+
+No law enforcement, carceral institutions, immigration enforcement entities, military entities, or military contractors
+may use the Work for any reason. This also applies to any individuals employed by those entities.
+
+No business entity where the ratio of pay (salaried, freelance, stocks, or other benefits)
+between the highest and lowest individual in the entity is greater than 50 : 1
+may use the Work for any reason.
+
+No private business with more than a thousand employees may use the Work for any reason.
+
+Unless the User has made substantial changes to the Work,
+or uses it only as a part of a new work also licensed under the license (eg. as a library, as a part of an anthology, etc.),
+they are prohibited from selling the Work. These modified works must carry a different name from the original project (i.e.
+"(project name)-xyz").
+
+No machine learning models used for profit by a business entity are permitted to be trained upon the Work.
+
+## 4. Requirements to Adopt
+
+To be able to legally adopt this license, the Licensor should be able to use the Work as defined in Section 3. Prohibitions.
+If the Licensor fails to meet any of the criteria, then they should cease usage of the license. The Work should be considered
+"Open Source", by the definition that "Open Source" means that all files required to execute the program (or create an
+executable via compilation) are publicly available without payment, compensation, or any form of restrictions not stated in
+this license. These files do not include any form of intermediate representation used by a compiler, nor deliberately
+obfuscated source code.
+
+## 5. Sanctions
+
+If the Licensor makes the User aware that they have not complied with the rules of the license, they can keep their license by
+complying within 30 days. If they do not do so, their license ends immediately.
+
+## 6. Warranty
+
+This Work is provided “as is”, without warranty of any kind, express or implied.
+The Licensor will not be liable to anyone for any damages related to the Work or this license,
+under any kind of legal claim as far as the law allows.
+
+## 7. Acceptance
+
+By using the Work, the entity using immediately enters a legally binding contract with the Licensor to follow this
+license. If any of the prohibitions (defined in Section 3. Prohibitions) or obligations (defined in Section 2.
+Obligations) of this license are violated, then see Section 5. Sanctions.

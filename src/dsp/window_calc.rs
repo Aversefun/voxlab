@@ -33,7 +33,7 @@ pub fn find_window_single(buffer: &[f32; ANALYSIS_WINDOW], sample_rate: u32) -> 
 
 const HOP: usize = ANALYSIS_WINDOW / 4;
 
-pub fn find_window(buffer: &AudioBuffer, plot: &mut Plot) -> Vec<(usize, usize)> {
+pub fn find_window(buffer: &AudioBuffer, plot: Option<&mut Plot>) -> Vec<(usize, usize)> {
     let mut results = Vec::new();
     let mut start = 0usize;
 
@@ -48,19 +48,21 @@ pub fn find_window(buffer: &AudioBuffer, plot: &mut Plot) -> Vec<(usize, usize)>
         start += HOP;
     }
 
-    plot.plot_points(
-        |x| results[(x * results.len() as f32) as usize].0 as f32 / buffer.samples.len() as f32,
-        &PURPLE,
-        "Window starts",
-    )
-    .unwrap();
-
-    plot.plot_points(
-        |x| results[(x * results.len() as f32) as usize].1 as f32 / ANALYSIS_WINDOW as f32,
-        &BLACK,
-        "Window lengths",
-    )
-    .unwrap();
+    plot.map(|plot| {
+        plot.plot_points(
+            |x| results[(x * results.len() as f32) as usize].0 as f32 / buffer.samples.len() as f32,
+            &PURPLE,
+            "Window starts",
+        )
+        .unwrap();
+    
+        plot.plot_points(
+            |x| results[(x * results.len() as f32) as usize].1 as f32 / ANALYSIS_WINDOW as f32,
+            &BLACK,
+            "Window lengths",
+        )
+        .unwrap();
+    });
 
     results
 }

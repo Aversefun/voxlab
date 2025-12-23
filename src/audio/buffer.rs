@@ -15,4 +15,7 @@ impl AudioBuffer {
             samples: self.samples.iter().copied().map(f).collect(),
         }
     }
+    pub fn len(&self) -> usize {
+        self.samples.len()
+    }
 }

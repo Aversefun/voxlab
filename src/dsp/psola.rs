@@ -1,8 +1,12 @@
 //! PSOLA adjustment.
 
-use crate::{audio::buffer::AudioBuffer, dsp::window::hann, plotting::Plot};
+use crate::{
+    audio::buffer::AudioBuffer,
+    dsp::{window::hann, window_calc::find_window},
+    plotting::Plot,
+};
 
-fn generate_pitch_marks(buffer: &AudioBuffer, windows: &[(usize, usize)]) -> Vec<usize> {
+pub fn generate_pitch_marks(buffer: &AudioBuffer, windows: &[(usize, usize)]) -> Vec<usize> {
     let mut marks = Vec::new();
 
     if windows.is_empty() {
@@ -33,13 +37,30 @@ fn generate_pitch_marks(buffer: &AudioBuffer, windows: &[(usize, usize)]) -> Vec
     marks
 }
 
-struct Grain<'a> {
+/// Return index of first element > bound.
+pub fn upper_bound(marks: &[usize], bound: usize) -> usize {
+    marks.partition_point(|&m| m <= bound)
+}
+
+/// Last mark <= bound.
+pub fn last_mark_leq(marks: &[usize], bound: usize) -> Option<usize> {
+    let i = upper_bound(marks, bound);
+    if i == 0 { None } else { Some(marks[i - 1]) }
+}
+
+/// First mark >= bound.
+pub fn first_mark_geq(marks: &[usize], bound: usize) -> Option<usize> {
+    let i = marks.partition_point(|&m| m < bound);
+    marks.get(i).copied()
+}
+
+pub struct Grain<'a> {
     center: usize,
     period: usize,
     samples: &'a [f32],
 }
 
-fn lag_at(pos: usize, windows: &[(usize, usize)]) -> usize {
+pub fn lag_at(pos: usize, windows: &[(usize, usize)]) -> usize {
     let mut lag = windows[0].1;
     for &(wpos, wlag) in windows {
         if wpos <= pos {
@@ -51,7 +72,7 @@ fn lag_at(pos: usize, windows: &[(usize, usize)]) -> usize {
     lag
 }
 
-fn extract_grains<'a>(
+pub fn extract_grains<'a>(
     buffer: &'a AudioBuffer,
     marks: &[usize],
     windows: &[(usize, usize)],
@@ -83,13 +104,21 @@ fn extract_grains<'a>(
     grains
 }
 
+pub fn get_avg_period(input: &AudioBuffer) -> usize {
+    let windows = find_window(input, None);
+    let marks = generate_pitch_marks(input, &windows);
+    let grains = extract_grains(input, &marks, &windows);
+
+    grains.iter().map(|g| g.period).sum::<usize>() / grains.len()
+}
+
 pub fn psola_constant(
     input: &AudioBuffer,
     pitch_ratio: f32,
     time_stretch: f32,
     plot: &mut Plot,
 ) -> AudioBuffer {
-    let analysis_windows = &crate::dsp::window_calc::find_window(&input, plot);
+    let analysis_windows = &find_window(input, Some(plot));
 
     assert!(pitch_ratio > 0.0);
     assert!(time_stretch > 0.0);
