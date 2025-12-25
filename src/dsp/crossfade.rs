@@ -5,7 +5,7 @@ use std::f32::consts::FRAC_PI_2;
 use crate::{
     audio::buffer::AudioBuffer,
     dsp::{
-        psola::{self, get_avg_period},
+        psola::{self, Grain, get_avg_period, overlap_add_grain},
         window_calc::find_window,
     },
 };
@@ -14,14 +14,24 @@ pub const CROSSFADE_TIME: usize = 2205;
 
 const MIN_TRANSITION_PERIODS: usize = 5;
 
-pub fn crossfade(buf1: &AudioBuffer, buf2: &AudioBuffer, fade_len: usize) -> AudioBuffer {
+/// Grain-level interpolation.
+#[derive(Clone, Debug)]
+pub struct GrainInterp {
+    /// Grain index within the target phoneme
+    pub target_grain: usize,
+    pub fade_len: usize,
+}
+
+pub fn crossfade(buf1: &AudioBuffer, buf2: &AudioBuffer, interp: &GrainInterp) -> AudioBuffer {
     let period = get_avg_period(buf1);
+
+    let fade_len = interp.fade_len.max(5 * period);
 
     let windows_a = find_window(buf1, None);
     let marks_a = psola::generate_pitch_marks(buf1, &windows_a);
 
     let (voiced_start_a, voiced_end_a) = find_voiced_region(&buf1).unwrap();
-    let cut_a = find_cut_a(&marks_a, voiced_end_a, fade_len, period).unwrap();
+    let cut_a = find_cut_a(&marks_a, voiced_end_a, interp.fade_len, period).unwrap();
 
     let windows_b = find_window(buf2, None);
     let marks_b = psola::generate_pitch_marks(buf2, &windows_b);
@@ -30,19 +40,29 @@ pub fn crossfade(buf1: &AudioBuffer, buf2: &AudioBuffer, fade_len: usize) -> Aud
     let start_b = find_start_b(
         &marks_b,
         voiced_start_b,
-        fade_len,
+        interp.fade_len,
         period,
         buf2.samples.len(),
     )
     .unwrap();
 
-    assert!(cut_a >= fade_len);
+    assert!(cut_a >= interp.fade_len);
     assert!(cut_a <= voiced_end_a);
 
     assert!(start_b >= voiced_start_b);
-    assert!(start_b + fade_len <= buf2.samples.len());
+    assert!(start_b + interp.fade_len <= buf2.samples.len());
 
-    phase_aligned_crossfade(buf1, buf2, cut_a, start_b, period, fade_len)
+    phase_aligned_crossfade(
+        buf1,
+        buf2,
+        cut_a,
+        start_b,
+        period,
+        GrainInterp {
+            target_grain: interp.target_grain,
+            fade_len,
+        },
+    )
 }
 
 pub fn find_cut_a(
@@ -75,25 +95,20 @@ pub fn phase_aligned_crossfade(
     buf1: &AudioBuffer,
     buf2: &AudioBuffer,
     cut_a: usize,
-    start_b: usize,
+    b_start: usize,
     period: usize,
-    fade_len: usize,
+    interp: GrainInterp,
 ) -> AudioBuffer {
     assert_eq!(buf1.sample_rate, buf2.sample_rate);
 
-    let fade_len = fade_len.max(5 * period);
+    let fade_len = interp.fade_len;
 
-    let start_b = align_b_start(&buf1.samples, &buf2.samples, cut_a, start_b, period);
+    let b_start = align_b_start(&buf1.samples, &buf2.samples, cut_a, b_start, period);
 
     let a_start = cut_a - fade_len;
-    let b_start = start_b;
 
-    assert!(a_start + fade_len <= buf1.samples.len());
-    assert!(b_start + fade_len <= buf2.samples.len());
-
-    let mut out = Vec::with_capacity(
-        a_start + fade_len + (buf2.samples.len() - (b_start + fade_len))
-    );
+    let mut out =
+        Vec::with_capacity(a_start + fade_len + (buf2.samples.len() - (b_start + fade_len)));
 
     let windows_a = find_window(buf1, None);
     let marks_a = psola::generate_pitch_marks(buf1, &windows_a);
@@ -103,28 +118,36 @@ pub fn phase_aligned_crossfade(
     let marks_b = psola::generate_pitch_marks(buf2, &windows_b);
     let grains_b = psola::extract_grains(&buf2, &marks_b, &windows_b);
 
-    let fade_len = fade_len / period;
-    let a_start = a_start / period;
+    let fade_len = fade_len / dbg!(period + 1);
+    let a_start = a_start / (period + 1);
+    let b_start = b_start / (period + 1);
+
+    assert!(dbg!(a_start) + dbg!(fade_len) <= dbg!(grains_a.len()));
+    assert!(b_start + fade_len <= grains_b.len());
 
     for i in 0..a_start {
-        out.append(&mut grains_a[i].samples.to_vec());
+        out.push(grains_a[i].samples.to_vec());
     }
 
     for k in 0..fade_len {
-        let t = transition_t(k, fade_len);
-        let ga = &grains_a[a_start + k];
+        let t = transition_t(k, dbg!(fade_len));
+        let ga = &grains_a[dbg!(dbg!(a_start) + dbg!(k))];
         let gb = &grains_b[k];
 
-        out.append(&mut psola::lerp_grain(ga, gb, t));
+        out.push(psola::lerp_grain(ga, gb, t));
     }
 
     for i in fade_len..grains_b.len() {
-        out.append(&mut grains_b[i].samples.to_vec());
+        out.push(grains_b[i].samples.to_vec());
     }
 
     AudioBuffer {
         sample_rate: buf1.sample_rate,
-        samples: out,
+        samples: overlap_add_grain(
+            out,
+            &[marks_a, marks_b].concat(),
+            a_start + fade_len + (buf2.samples.len() - (b_start + fade_len)),
+        ),
     }
 }
 

@@ -89,12 +89,8 @@ fn remove_dc(g: &mut [f32]) {
     }
 }
 
-pub fn overlap_add_grain(
-    mut grains: Vec<Vec<f32>>,
-    marks: &[usize],
-    out_len: usize,
-) -> Vec<f32> {
-    debug_assert!(grains.iter().all(|g| g.len() == grains[0].len()));
+pub fn overlap_add_grain(mut grains: Vec<Vec<f32>>, marks: &[usize], out_len: usize) -> Vec<f32> {
+    // debug_assert!(grains.iter().all(|g| g.len() == grains[0].len()));
 
     let mut out = vec![0.0; out_len];
     let mut weight = vec![0.0; out_len];
@@ -164,6 +160,7 @@ pub fn extract_grains<'a>(
     grains
 }
 
+/// Returns the period as a number of samples.
 pub fn get_avg_period(input: &AudioBuffer) -> usize {
     let windows = find_window(input, None);
     let marks = generate_pitch_marks(input, &windows);
@@ -176,9 +173,9 @@ pub fn psola_constant(
     input: &AudioBuffer,
     pitch_ratio: f32,
     time_stretch: f32,
-    plot: &mut Plot,
+    plot: Option<&mut Plot>,
 ) -> AudioBuffer {
-    let analysis_windows = &find_window(input, Some(plot));
+    let analysis_windows = &find_window(input, plot);
 
     assert!(pitch_ratio > 0.0);
     assert!(time_stretch > 0.0);

@@ -5,6 +5,7 @@ use plotters::style::{GREEN, full_palette::ORANGE};
 use crate::{audio::buffer::AudioBuffer, dsp::low_pass, nice::lerp, plotting::Plot};
 
 /// Naive pitch shift.
+#[deprecated = "use PSOLA"]
 pub fn pitch_shift(input: &AudioBuffer, ratio: f32) -> AudioBuffer {
     assert!(ratio > 0.0);
 
@@ -30,6 +31,7 @@ pub fn pitch_shift(input: &AudioBuffer, ratio: f32) -> AudioBuffer {
     }
 }
 
+#[deprecated = "use PSOLA"]
 pub fn pitch_glide(
     input: &AudioBuffer,
     mut ratio: impl FnMut(f32) -> f32,

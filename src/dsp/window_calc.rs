@@ -55,7 +55,7 @@ pub fn find_window(buffer: &AudioBuffer, plot: Option<&mut Plot>) -> Vec<(usize,
             "Window starts",
         )
         .unwrap();
-    
+
         plot.plot_points(
             |x| results[(x * results.len() as f32) as usize].1 as f32 / ANALYSIS_WINDOW as f32,
             &BLACK,

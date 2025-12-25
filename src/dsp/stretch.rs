@@ -13,6 +13,7 @@ const ANALYSIS_HOP: usize = 256;
 
 /// Naive OLA time-stretch. Robotic artifacts expected (it does not sound human
 /// at all lol).
+#[deprecated = "use PSOLA"]
 pub fn time_stretch(input: &AudioBuffer, stretch: f32) -> AudioBuffer {
     let output_length = (input.samples.len() as f32 * stretch).ceil() as usize;
     let synthesis_hop = (ANALYSIS_HOP as f32 * stretch).floor() as usize;
@@ -51,6 +52,7 @@ pub fn time_stretch(input: &AudioBuffer, stretch: f32) -> AudioBuffer {
 /// Time-stretch where it changes over time. The function takes in a value
 /// between 0 and 1 (where 0 is the first frame and 1 is the last) and outputs
 /// how much to stretch.
+#[deprecated = "use PSOLA"]
 pub fn time_glide(
     input: &AudioBuffer,
     mut stretch: impl FnMut(f32) -> f32,

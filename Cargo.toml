@@ -10,7 +10,6 @@ plotters = "0.3.7"
 
 [lints.rust]
 missing_docs = "deny"
-unused = "allow"
 
 [lints.clippy]
 missing_docs_in_private_items = "warn"
