@@ -54,10 +54,50 @@ pub fn first_mark_geq(marks: &[usize], bound: usize) -> Option<usize> {
     marks.get(i).copied()
 }
 
+#[derive(Clone, Debug, PartialEq)]
 pub struct Grain<'a> {
-    center: usize,
-    period: usize,
-    samples: &'a [f32],
+    pub center: usize,
+    pub period: usize,
+    pub samples: &'a [f32],
+}
+
+pub fn lerp_grain(a: &Grain<'_>, b: &Grain<'_>, t: f32) -> Vec<f32> {
+    let (a, b) = (a.samples, b.samples);
+
+    let n = a.len().min(b.len());
+    let mut out = Vec::with_capacity(n);
+
+    for i in 0..n {
+        out.push(a[i] * (1.0 - t) + b[i] * t);
+    }
+
+    out
+}
+
+pub fn overlap_add_grain(
+    mut grains: Vec<Vec<f32>>,
+    marks: &[usize],
+    out_len: usize,
+) -> Vec<f32> {
+    for grain in &mut grains {
+        let hann = hann(grain.len());
+        for i in 0..(grain.len()) {
+            grain[i] *= hann[i];
+        }
+    }
+
+    let mut out = vec![0.0; out_len];
+
+    for (g, &m) in grains.iter().zip(marks.iter()) {
+        let start = m.saturating_sub(g.len() / 2);
+        for i in 0..g.len() {
+            if start + i < out.len() {
+                out[start + i] += g[i];
+            }
+        }
+    }
+
+    out
 }
 
 pub fn lag_at(pos: usize, windows: &[(usize, usize)]) -> usize {
