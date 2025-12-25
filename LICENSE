@@ -4,6 +4,14 @@ Derived from the [Opinionated Queer License v1.3](https://oql.avris.it/license/v
 
 Copyright © 2025 Vivian Beck
 
+## Glossary
+
+- "Licensor": the creators of the Work.
+- "User": any person, group or legal entity that uses, modifies, distributes, or otherwise exercises rights in the Work.
+- "Redistributor": a User who distributes the Work or builds/distributes binary artifacts (including CI systems, package repositories, maintainers).
+- "Prohibited Entity": an entity described in Section 3 that is disallowed from using the Work.
+- "Substantial Change": a modification that materially changes the Work's primary functionality or purpose (see examples below).
+
 ## 1. Permissions
 
 The creators of the Work (“The Licensor”) grant permission
@@ -15,10 +23,10 @@ subject to the following conditions:
 
 The User must give appropriate credit to the Licensor,
 provide a copy of this license, and indicate whether and what kind of changes were made.
-The User may do so in any reasonable manner,
-but not in any way that suggests the Licensor endorses the User or their use.
+The User may do so in any reasonable manner, but not in any way that suggests the Licensor endorses the User or their use.
 The User must also provide some form of link to the original Work.
-The User must affirm that LGBTQ+ rights are human rights and not contradict this statement.
+Users who do not meet the exceptions in Section 8. Exceptions must affirm that LGBTQ+ rights are human rights and not
+contradict this statement. Users who do meet the exceptions must not contradict that LGBTQ+ rights are human rights.
 
 ## 3. Prohibitions
 
@@ -52,12 +60,11 @@ No machine learning models used for profit by a business entity are permitted to
 
 ## 4. Requirements to Adopt
 
-To be able to legally adopt this license, the Licensor should be able to use the Work as defined in Section 3. Prohibitions.
-If the Licensor fails to meet any of the criteria, then they should cease usage of the license. The Work should be considered
-"Open Source", by the definition that "Open Source" means that all files required to execute the program (or create an
-executable via compilation) are publicly available without payment, compensation, or any form of restrictions not stated in
-this license. These files do not include any form of intermediate representation used by a compiler, nor deliberately
-obfuscated source code.
+To be able to legally adopt this license, the Licensor should not be a Prohibited Entity. If the Licensor fails to meet any
+of the criteria, then they should cease usage of the license. The Work should be considered "Open Source", by the definition
+that "Open Source" means that all files required to execute the program (or create an executable via compilation) are publicly
+available without payment, compensation, or any form of restrictions not stated in this license. These files do not include
+any form of intermediate representation used by a compiler, nor deliberately obfuscated source code.
 
 ## 5. Sanctions
 
@@ -75,3 +82,15 @@ under any kind of legal claim as far as the law allows.
 By using the Work, the entity using immediately enters a legally binding contract with the Licensor to follow this
 license. If any of the prohibitions (defined in Section 3. Prohibitions) or obligations (defined in Section 2.
 Obligations) of this license are violated, then see Section 5. Sanctions.
+
+## 8. Exceptions
+
+Exceptions to certain clauses are in place for CI systems, package repositories, packaging systems, and any entity the
+Licensor chooses. The Licensor may make exceptions to sell produced binaries as long as the code is still Open Source
+as defined in Section 4. Requirements to Adopt. The Licensor may also grant any other license to specific entities
+(for example, package repositories). The Licensor may also, at any time and for any reason, revoke another license.
+
+## Contact
+
+To request an exception, to submit an affirmation, or to report a suspected violation, contact the maintainers.
+On this work, you contact them at [vivian@verygay.fyi](mailto:vivian@verygay.fyi).

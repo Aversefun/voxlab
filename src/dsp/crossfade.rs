@@ -111,7 +111,7 @@ pub fn phase_aligned_crossfade(
     }
 
     for k in 0..fade_len {
-        let t = k as f32 / (fade_len - 1) as f32;
+        let t = transition_t(k, fade_len);
         let ga = &grains_a[a_start + k];
         let gb = &grains_b[k];
 
@@ -125,6 +125,17 @@ pub fn phase_aligned_crossfade(
     AudioBuffer {
         sample_rate: buf1.sample_rate,
         samples: out,
+    }
+}
+
+fn transition_t(k: usize, len: usize) -> f32 {
+    let mid = len / 2;
+
+    if k == mid || k == mid - 1 {
+        0.5
+    } else {
+        let raw = k as f32 / (len - 1) as f32;
+        raw * raw * (3.0 - 2.0 * raw)
     }
 }
 

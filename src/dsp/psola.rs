@@ -62,7 +62,10 @@ pub struct Grain<'a> {
 }
 
 pub fn lerp_grain(a: &Grain<'_>, b: &Grain<'_>, t: f32) -> Vec<f32> {
-    let (a, b) = (a.samples, b.samples);
+    let (mut a, mut b) = (a.samples.to_vec(), b.samples.to_vec());
+
+    remove_dc(&mut a);
+    remove_dc(&mut b);
 
     let n = a.len().min(b.len());
     let mut out = Vec::with_capacity(n);
@@ -71,7 +74,19 @@ pub fn lerp_grain(a: &Grain<'_>, b: &Grain<'_>, t: f32) -> Vec<f32> {
         out.push(a[i] * (1.0 - t) + b[i] * t);
     }
 
+    let hann = hann(out.len());
+    for i in 0..(out.len()) {
+        out[i] *= hann[i].powf(0.8);
+    }
+
     out
+}
+
+fn remove_dc(g: &mut [f32]) {
+    let mean = g.iter().copied().sum::<f32>() / g.len() as f32;
+    for x in g {
+        *x -= mean;
+    }
 }
 
 pub fn overlap_add_grain(
@@ -79,21 +94,26 @@ pub fn overlap_add_grain(
     marks: &[usize],
     out_len: usize,
 ) -> Vec<f32> {
-    for grain in &mut grains {
-        let hann = hann(grain.len());
-        for i in 0..(grain.len()) {
-            grain[i] *= hann[i];
-        }
-    }
+    debug_assert!(grains.iter().all(|g| g.len() == grains[0].len()));
 
     let mut out = vec![0.0; out_len];
+    let mut weight = vec![0.0; out_len];
 
     for (g, &m) in grains.iter().zip(marks.iter()) {
         let start = m.saturating_sub(g.len() / 2);
+        let win = hann(g.len());
         for i in 0..g.len() {
-            if start + i < out.len() {
-                out[start + i] += g[i];
+            let idx = start + i;
+            if idx < out_len {
+                out[idx] += g[i];
+                weight[idx] += win[i].powf(0.8);
             }
+        }
+    }
+
+    for i in 0..out_len {
+        if weight[i] > 1e-6 {
+            out[i] /= weight[i];
         }
     }
 
